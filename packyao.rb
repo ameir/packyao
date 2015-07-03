@@ -58,7 +58,7 @@ def create_package(params)
   arguments = [
     '-n', params['name'],
     '-v', params['version'],
-    '-t', 'deb',
+    '-t', params['output'] || 'tar',
     '-s', 'dir',
     '-C', 'packyao-dist',
     '-m', params['maintainer'] || 'packyao <ameirh+packyao@gmail.com>',
