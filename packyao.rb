@@ -58,12 +58,15 @@ def create_package(params)
   arguments = [
     '-n', params['name'],
     '-v', params['version'],
-    '-m', params['maintainer'] || 'packyao <ameirh+packyao@gmail.com>',
     '-t', 'deb',
     '-s', 'dir',
+    '-C', 'packyao-dist',
+    '-m', params['maintainer'] || 'packyao <ameirh+packyao@gmail.com>',
+    '--iteration', 1,
     '--description', params['description'] || 'This package was created by packyao.',
     '--url', params['url'] || 'http://www.packyao.com',
-    '-C', 'packyao-dist'
+    '--verbose',
+    '--force'
   ]
 
   fail 'problem creating package' unless FPM::Command.new('fpm').run(arguments) == 0
