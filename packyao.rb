@@ -62,7 +62,7 @@ def create_package(params)
     '-s', 'dir',
     '-C', 'packyao-dist',
     '-m', params['maintainer'] || 'packyao <ameirh+packyao@gmail.com>',
-    '--iteration', 1,
+    '--iteration', params['iteration'] || 1,
     '--description', params['description'] || 'This package was created by packyao.',
     '--url', params['url'] || 'http://www.packyao.com',
     '--verbose',
