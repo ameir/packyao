@@ -73,7 +73,7 @@ def generate_script
   require 'erb'
   filename = "build.sh"
 
-  template = IO.read('build.sh.erb')
+  template = IO.read('../build.sh.erb')
   message = ERB.new(template, 0, '%<>')
   File.write(filename, message.result(binding))
   filename
