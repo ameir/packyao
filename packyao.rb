@@ -1,6 +1,8 @@
 
 require 'json'
 
+$commands=[]
+
 def run_command(command)
   puts "running command '#{command}'..."
   system(command)
@@ -10,28 +12,23 @@ end
 # TODO: checkout specific branch or commit
 def git_clone(_url, _branch_or_commit = 'master')
   commands = ['git init', 'git remote add origin ' + url, 'get pull']
-  commands.each do |command|
-    run_command(command)
-  end
+  $commands+=commands
 end
 
 def http_download(url)
   command = "wget -O source '#{url}'"
-  run_command(command)
+  $commands.push(command)
 end
 
-def build_package(params)
-  puts "Currently in #{Dir.pwd}"
-
-  # set env vars
+def set_env(params)
   params['env'].each do |key, value|
-    puts "exporting #{key}=#{value}"
-    ENV[key] = value
+    command="export #{key}=#{value}"
+    $commands.push(command)
   end
+end
 
-  params['commands'].each do |command|
-    run_command(command)
-  end
+def run_user_commands(params)
+  $commands+=params['commands']
 end
 
 def create_package_layout(params)
@@ -72,6 +69,16 @@ def create_package(params)
   fail 'problem creating package' unless FPM::Command.new('fpm').run(arguments) == 0
 end
 
+def generate_script
+  require 'erb'
+  filename = "build.sh"
+
+  template = IO.read('build.sh.erb')
+  message = ERB.new(template, 0, '%<>')
+  File.write(filename, message.result(binding))
+  filename
+end
+
 filename = 'packyao.json'
 params = JSON.parse(File.read(filename))
 
@@ -88,6 +95,9 @@ else
   puts 'No supported download method defined.'
 end
 
-build_package(params)
+set_env(params)
+run_user_commands(params)
+generate_script
+run_command('bash build.sh')
 create_package_layout(params)
 create_package(params)
