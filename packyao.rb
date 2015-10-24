@@ -101,4 +101,9 @@ run_user_commands(params)
 generate_script
 run_command('bash build.sh')
 create_package_layout(params)
-create_package(params)
+
+# create each output artifact
+params['outputs'].each do |output|
+  params['output'] = output
+  create_package(params)
+end
