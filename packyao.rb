@@ -33,7 +33,7 @@ end
 
 def create_package_layout(params)
   require 'fileutils'
-  workspace = 'packyao-dist'
+  workspace = 'dist'
   Dir.mkdir(workspace, 0777) unless Dir.exist?(workspace)
 
   puts "Currently in #{Dir.pwd}"
@@ -57,7 +57,7 @@ def create_package(params)
     '-v', params['version'],
     '-t', params['output'] || 'tar',
     '-s', 'dir',
-    '-C', 'packyao-dist',
+    '-C', 'dist',
     '-m', params['maintainer'] || 'packyao <ameirh+packyao@gmail.com>',
     '--iteration', params['iteration'] || 1,
     '--description', params['description'] || 'This package was created by packyao.',
