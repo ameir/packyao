@@ -34,7 +34,7 @@ end
 def create_package_layout(params)
   require 'fileutils'
   workspace = 'dist'
-  Dir.mkdir(workspace, 0777) unless Dir.exist?(workspace)
+  FileUtils.mkdir_p("#{workspace}/builds")
 
   puts "Currently in #{Dir.pwd}"
   params['package_files'].each do |source, destination|
@@ -58,6 +58,7 @@ def create_package(params)
     '-t', params['output'] || 'tar',
     '-s', 'dir',
     '-C', 'dist',
+    '-p', 'dist/builds',
     '-m', params['maintainer'] || 'packyao <ameirh+packyao@gmail.com>',
     '--iteration', params['iteration'] || 1,
     '--description', params['description'] || 'This package was created by packyao.',
