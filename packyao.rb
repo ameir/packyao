@@ -83,7 +83,7 @@ end
 filename = 'packyao.json'
 params = JSON.parse(File.read(filename))
 
-workspace = 'packyao-workspace'
+workspace = 'workspace'
 Dir.mkdir(workspace, 0777) unless Dir.exist?(workspace)
 Dir.chdir(workspace)
 
