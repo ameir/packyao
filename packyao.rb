@@ -43,7 +43,7 @@ def create_package_layout(params)
     puts "Creating directory '#{destination_dir}'..."
     FileUtils.mkdir_p(destination_dir) unless Dir.exist?(destination_dir)
     puts "Copying: #{source} -> #{workspace + destination}"
-    FileUtils.cp(source, workspace + destination)
+    FileUtils.cp_r(source, workspace + destination)
   end
 end
 
