@@ -10,8 +10,8 @@ def run_command(command)
 end
 
 # TODO: checkout specific branch or commit
-def git_clone(_url, _branch_or_commit = 'master')
-  commands = ['git init', 'git remote add origin ' + url, 'get pull']
+def git_clone(url, branch_or_commit = 'master')
+  commands = ['git init', 'git remote add origin ' + url, 'git pull']
   $commands+=commands
 end
 
