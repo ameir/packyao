@@ -36,7 +36,15 @@ def create_package_layout(params)
   FileUtils.mkdir_p("#{workspace}/builds")
 
   puts "Currently in #{Dir.pwd}"
-  params['package_files'].each do |source, destination|
+
+  # use hash based on artifact type
+  files_hash = params['package_files']
+  if (params['package_files'].has_key?(params['output']) do
+    puts "Creating #{params['output']}-specific package"
+    files_hash = params['package_files'][params['output']]
+  end
+
+  files_hash.each do |source, destination|
     puts "Processing: #{source} -> #{destination}"
     destination_dir = File.dirname(workspace + destination)
     puts "Creating directory '#{destination_dir}'..."
