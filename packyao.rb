@@ -39,7 +39,7 @@ def create_package_layout(params)
 
   # use hash based on artifact type
   files_hash = params['package_files']
-  if (params['package_files'].has_key?(params['output']) do
+  if (params['package_files'].has_key?(params['output'])
     puts "Creating #{params['output']}-specific package"
     files_hash = params['package_files'][params['output']]
   end
