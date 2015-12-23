@@ -66,6 +66,7 @@ def create_package(params)
     '--force'
   ]
 
+  puts "Creating #{params['output']} build..."
   fail 'problem creating package' unless FPM::Command.new('fpm').run(arguments) == 0
 end
 
