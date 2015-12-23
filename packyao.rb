@@ -39,7 +39,7 @@ def create_package_layout(params)
 
   # use hash based on artifact type
   files_hash = params['package_files']
-  if (params['package_files'].has_key?(params['output']))
+  if (files_hash.has_key?(params['output']))
     puts "Creating #{params['output']}-specific package"
     files_hash = params['package_files'][params['output']]
   end
@@ -108,10 +108,10 @@ set_env(params)
 run_user_commands(params)
 generate_script
 run_command('bash build.sh')
-create_package_layout(params)
 
 # create each output artifact
 params['outputs'].each do |output|
   params['output'] = output
+  create_package_layout(params)
   create_package(params)
 end
