@@ -9,16 +9,6 @@ def run_command(command)
   puts "Returned: #{$CHILD_STATUS}"
 end
 
-def git_clone(url, branch_or_commit = 'master')
-  commands = ['git init', 'git remote add origin ' + url, 'git pull origin ' + branch_or_commit]
-  $commands+=commands
-end
-
-def http_download(url)
-  command = "wget -O source '#{url}'"
-  $commands.push(command)
-end
-
 def set_env(params)
   params['env'].each do |key, value|
     command="export #{key}=#{value}"
@@ -94,15 +84,6 @@ params = JSON.parse(File.read(filename))
 workspace = 'workspace'
 Dir.mkdir(workspace, 0777) unless Dir.exist?(workspace)
 Dir.chdir(workspace)
-
-case params['type']
-when 'git'
-  git_clone(params['source'])
-when 'http'
-  http_download(params['source'])
-else
-  puts 'No supported download method defined.'
-end
 
 set_env(params)
 run_user_commands(params)
