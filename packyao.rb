@@ -1,7 +1,7 @@
 
 require 'json'
 
-$commands=[]
+$commands = []
 
 def run_command(command)
   puts "running command '#{command}'..."
@@ -11,13 +11,13 @@ end
 
 def set_env(params)
   params['env'].each do |key, value|
-    command="export #{key}=#{value}"
+    command = "export #{key}=#{value}"
     $commands.push(command)
   end
 end
 
 def run_user_commands(params)
-  $commands+=params['commands']
+  $commands += params['commands']
 end
 
 def create_package_layout(params)
@@ -29,7 +29,7 @@ def create_package_layout(params)
 
   # use hash based on artifact type
   files_hash = params['package_files']
-  if (files_hash.has_key?(params['output']))
+  if files_hash.key?(params['output'])
     puts "Creating #{params['output']}-specific package"
     files_hash = params['package_files'][params['output']]
   end
@@ -65,12 +65,12 @@ def create_package(params)
   ]
 
   puts "Creating #{params['output']} build..."
-  fail 'problem creating package' unless FPM::Command.new('fpm').run(arguments) == 0
+  raise 'problem creating package' unless FPM::Command.new('fpm').run(arguments) == 0
 end
 
 def generate_script
   require 'erb'
-  filename = "build.sh"
+  filename = 'build.sh'
 
   template = IO.read('../build.sh.erb')
   message = ERB.new(template, 0, '%<>')
