@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 
 require 'json'
 
@@ -14,6 +15,25 @@ def set_env(params)
     command = "export #{key}=#{value}"
     $commands.push(command)
   end
+end
+
+def generate_packer_config(params)
+  packer = {}
+  packer['builders'] = [{
+    'type' => 'docker',
+    'image' => params['build_distro'],
+    'export_path' => 'image.tar'
+  }]
+
+  packer['provisioners'] = [
+    {
+      'type' => 'shell',
+      'inline' => $commands
+    }
+  ]
+  puts packer
+  puts JSON.pretty_generate(packer)
+  File.write('packer.json', JSON.pretty_generate(packer))
 end
 
 def run_user_commands(params)
@@ -78,7 +98,26 @@ def generate_script
   filename
 end
 
-filename = 'packyao.json'
+puts ARGV[0]
+
+command = ARGV[0]
+filename = ARGV[1]
+
+case command
+when 'generate'
+  params = JSON.parse(File.read(filename))
+
+  set_env(params)
+  run_user_commands(params)
+  generate_packer_config(params)
+
+when 'build'
+  puts 'salam'
+else
+  puts 'invalid argument'
+end
+exit
+
 params = JSON.parse(File.read(filename))
 
 workspace = 'workspace'
