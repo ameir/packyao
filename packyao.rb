@@ -1,19 +1,23 @@
 #!/usr/bin/env ruby
 
 require 'json'
+require 'English'
 
-$commands = []
+$commands = {
+  'type' => 'shell'
+}
 
 def run_command(command)
   puts "running command '#{command}'..."
   system(command)
-  puts "Returned: #{$CHILD_STATUS}"
+  puts "Return code: #{$CHILD_STATUS}"
 end
 
 def set_env(params)
+  $commands['environment_vars'] = []
   params['env'].each do |key, value|
-    command = "export #{key}=#{value}"
-    $commands.push(command)
+    command = "#{key}=#{value}"
+    $commands['environment_vars'].push(command)
   end
 end
 
@@ -25,19 +29,14 @@ def generate_packer_config(params)
     'export_path' => 'image.tar'
   }]
 
-  packer['provisioners'] = [
-    {
-      'type' => 'shell',
-      'inline' => $commands
-    }
-  ]
+  packer['provisioners'] = [$commands]
   puts packer
   puts JSON.pretty_generate(packer)
   File.write('packer.json', JSON.pretty_generate(packer))
 end
 
 def run_user_commands(params)
-  $commands += params['commands']
+  $commands['inline'] = params['commands']
 end
 
 def create_package_layout(params)
@@ -60,7 +59,8 @@ def create_package_layout(params)
     puts "Creating directory '#{destination_dir}'..."
     FileUtils.mkdir_p(destination_dir) unless Dir.exist?(destination_dir)
     puts "Copying: #{source} -> #{workspace + destination}"
-    FileUtils.cp_r(source, workspace + destination)
+    run_command("tar xvf #{File.dirname(__FILE__)}/image.tar #{source[1..-1]} -C /tmp")
+    FileUtils.cp_r("/tmp/#{File.basename(source)}", workspace + destination)
   end
 end
 
@@ -88,50 +88,27 @@ def create_package(params)
   raise 'problem creating package' unless FPM::Command.new('fpm').run(arguments) == 0
 end
 
-def generate_script
-  require 'erb'
-  filename = 'build.sh'
-
-  template = IO.read('../build.sh.erb')
-  message = ERB.new(template, 0, '%<>')
-  File.write(filename, message.result(binding))
-  filename
-end
-
 puts ARGV[0]
 
 command = ARGV[0]
 filename = ARGV[1]
+params = JSON.parse(File.read(filename))
 
 case command
 when 'generate'
-  params = JSON.parse(File.read(filename))
-
   set_env(params)
   run_user_commands(params)
   generate_packer_config(params)
-
 when 'build'
-  puts 'salam'
+  run_command('packer build packer.json')
+when 'package'
+  params['outputs'].each do |output|
+    params['output'] = output
+    puts params
+    create_package_layout(params)
+    create_package(params)
+  end
 else
   puts 'invalid argument'
-end
-exit
-
-params = JSON.parse(File.read(filename))
-
-workspace = 'workspace'
-Dir.mkdir(workspace, 0777) unless Dir.exist?(workspace)
-Dir.chdir(workspace)
-
-set_env(params)
-run_user_commands(params)
-generate_script
-run_command('bash build.sh')
-
-# create each output artifact
-params['outputs'].each do |output|
-  params['output'] = output
-  create_package_layout(params)
-  create_package(params)
+  exit 1
 end
