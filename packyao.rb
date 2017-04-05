@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'json'
 require 'English'
@@ -9,7 +10,7 @@ $commands = {
 
 def run_command(command)
   puts "running command '#{command}'..."
-  system(command) or raise "Command failed: '#{command}'"
+  raise "Command failed: '#{command}'" unless system(command)
   puts "Return code: #{$CHILD_STATUS}"
 end
 
