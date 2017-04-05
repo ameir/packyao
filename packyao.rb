@@ -75,7 +75,7 @@ def create_package(params)
     '-v', params['version'],
     '-t', params['output'] || 'tar',
     '-s', 'dir',
-    '-C', 'dist/scratch',
+    '-C', "dist/scratch/#{params['output']}",
     '-p', 'dist/builds',
     '-m', params['maintainer'] || 'packyao <ameirh+packyao@gmail.com>',
     '--iteration', params['iteration'] || 1,
