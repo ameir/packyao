@@ -59,8 +59,8 @@ def create_package_layout(params)
     puts "Creating directory '#{destination_dir}'..."
     FileUtils.mkdir_p(destination_dir) unless Dir.exist?(destination_dir)
     puts "Copying: #{source} -> #{workspace + destination}"
-    run_command("tar xvf #{File.dirname(__FILE__)}/image.tar #{source[1..-1]} -C /tmp")
-    FileUtils.cp_r("/tmp/#{File.basename(source)}", workspace + destination)
+    run_command("cd /tmp; tar xvf #{File.expand_path(File.dirname(__FILE__))}/image.tar #{source[1..-1]}")
+    FileUtils.cp_r("/tmp#{source}", workspace + destination)
   end
 end
 
