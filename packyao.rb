@@ -9,7 +9,7 @@ $commands = {
 
 def run_command(command)
   puts "running command '#{command}'..."
-  system(command)
+  system(command) or raise "Command failed: '#{command}'"
   puts "Return code: #{$CHILD_STATUS}"
 end
 
