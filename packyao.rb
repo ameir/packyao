@@ -42,7 +42,7 @@ end
 def create_package_layout(params)
   require 'fileutils'
   workspace = 'dist'
-  scratchspace = "#{workspace}/scratch"
+  scratchspace = "#{workspace}/scratch/#{params['output']}"
   FileUtils.mkdir_p("#{workspace}/builds")
 
   puts "Currently in #{Dir.pwd}"
