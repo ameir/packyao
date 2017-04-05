@@ -42,6 +42,7 @@ end
 def create_package_layout(params)
   require 'fileutils'
   workspace = 'dist'
+  scratchspace = "#{workspace}/scratch"
   FileUtils.mkdir_p("#{workspace}/builds")
 
   puts "Currently in #{Dir.pwd}"
@@ -55,12 +56,12 @@ def create_package_layout(params)
 
   files_hash.each do |source, destination|
     puts "Processing: #{source} -> #{destination}"
-    destination_dir = File.dirname(workspace + destination)
+    destination_dir = File.dirname(scratchspace + destination)
     puts "Creating directory '#{destination_dir}'..."
     FileUtils.mkdir_p(destination_dir) unless Dir.exist?(destination_dir)
-    puts "Copying: #{source} -> #{workspace + destination}"
+    puts "Copying: #{source} -> #{scratchspace + destination}"
     run_command("cd /tmp; tar xvf #{File.expand_path(File.dirname(__FILE__))}/image.tar #{source[1..-1]}")
-    FileUtils.cp_r("/tmp#{source}", workspace + destination)
+    FileUtils.cp_r("/tmp#{source}", scratchspace + destination)
   end
 end
 
@@ -74,7 +75,7 @@ def create_package(params)
     '-v', params['version'],
     '-t', params['output'] || 'tar',
     '-s', 'dir',
-    '-C', 'dist',
+    '-C', 'dist/scratch',
     '-p', 'dist/builds',
     '-m', params['maintainer'] || 'packyao <ameirh+packyao@gmail.com>',
     '--iteration', params['iteration'] || 1,
