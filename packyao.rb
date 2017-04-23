@@ -109,7 +109,7 @@ def generate_metadata(filename)
   end
 
   output['files'] = files.map(&:strip)
-  puts JSON.pretty_generate(output)
+  File.write("#{filename}.json", JSON.pretty_generate(output))
 end
 
 def file_list_deb(filename)
