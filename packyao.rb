@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 require 'json'
-require 'English'
+require 'open3'
 
 $commands = {
   'type' => 'shell'
@@ -10,8 +10,13 @@ $commands = {
 
 def run_command(command)
   puts "running command '#{command}'..."
-  raise "Command failed: '#{command}'" unless system(command)
-  puts "Return code: #{$CHILD_STATUS}"
+  output, status = Open3.capture2e(command)
+
+  puts "Output: \n" + output
+  puts "Return code: #{status.exitstatus}"
+
+  raise "Command failed: '#{command}'" unless status.success?
+  output
 end
 
 def set_env(params)
@@ -90,11 +95,36 @@ def create_package(params)
   raise 'problem creating package' unless FPM::Command.new('fpm').run(arguments) == 0
 end
 
+def generate_metadata(filename)
+  extension = File.extname(filename)
+  output = {}
+  case extension
+  when '.deb'
+    files = file_list_deb(filename).lines.drop(1).map { |a| a[1..-1] }
+  when '.rpm'
+    files = file_list_rpm(filename).lines
+  else
+    puts 'invalid extension!'
+    exit 1
+  end
+
+  output['files'] = files.map(&:strip)
+  puts JSON.pretty_generate(output)
+end
+
+def file_list_deb(filename)
+  run_command("dpkg -c #{filename} | awk '{print $NF}'")
+end
+
+def file_list_rpm(filename)
+  run_command("rpm -qlp #{filename} 2>/dev/null")
+end
+
 puts ARGV[0]
 
 command = ARGV[0]
 filename = ARGV[1]
-params = JSON.parse(File.read(filename))
+params = JSON.parse(File.read(filename)) if File.extname(filename) == '.json'
 
 case command
 when 'generate'
@@ -110,6 +140,8 @@ when 'package'
     create_package_layout(params)
     create_package(params)
   end
+when 'metadata'
+  generate_metadata(filename)
 else
   puts 'invalid argument'
   exit 1
