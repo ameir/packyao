@@ -3,6 +3,7 @@
 
 require 'json'
 require 'open3'
+require 'fileutils'
 
 $commands = {
   'type' => 'shell'
@@ -46,7 +47,6 @@ def run_user_commands(params)
 end
 
 def create_package_layout(params)
-  require 'fileutils'
   workspace = 'dist'
   scratchspace = "#{workspace}/scratch/#{params['output']}"
   FileUtils.mkdir_p("#{workspace}/builds")
@@ -96,20 +96,19 @@ def create_package(params)
 end
 
 def generate_metadata(filename)
-  extension = File.extname(filename)
+  dir = "#{filename}-metadata"
+  FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
   output = {}
+  extension = File.extname(filename)
   case extension
   when '.deb'
-    files = file_list_deb(filename).lines.drop(1).map { |a| a[1..-1] }
+    run_command("mkdir -vp #{dir}/repodata && dpkg-scanpackages . | gzip -9 -c > #{dir}/repodata/Packages.gz")
   when '.rpm'
-    files = file_list_rpm(filename).lines
+    run_command("createrepo . --no-database --simple-md-filenames -n #{filename} -o #{dir}")
   else
     puts 'invalid extension!'
     exit 1
   end
-
-  output['files'] = files.map(&:strip)
-  File.write("#{filename}.json", JSON.pretty_generate(output))
 end
 
 def file_list_deb(filename)
