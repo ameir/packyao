@@ -76,10 +76,10 @@ def create_package_layout(params)
     puts "Creating directory '#{destination_dir}'..."
     FileUtils.mkdir_p(destination_dir) unless Dir.exist?(destination_dir)
     puts "Copying: #{source} -> #{scratchspace + destination}"
-    run_command("cd /tmp; tar xvf #{__dir__}/image.tar '#{source[1..-1]}'")
+    run_command("cd /tmp; tar --wildcards xvf #{__dir__}/image.tar '#{source[1..-1]}'")
     puts "Globbing /tmp#{source}:"
     p Dir.glob("/tmp#{source}")
-    FileUtils.cp_r(Dir.glob("/tmp#{source}"), scratchspace + destination)
+    FileUtils.cp_r(Dir.glob("/tmp#{source}"), scratchspace + destination, verbose: true)
   end
 end
 
