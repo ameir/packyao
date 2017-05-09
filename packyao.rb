@@ -37,10 +37,10 @@ def generate_packer_config(params)
   }]
 
   packer['provisioners'] = []
-  if Dir.exist?('files')
+  if Dir.exist?("#{__dir__}/recipe/files")
     files = {
       'type' => 'file',
-      'source' => 'files',
+      'source' => "#{__dir__}/recipe/files",
       'destination' => '/tmp/',
     }
     packer['provisioners'].push(files)
