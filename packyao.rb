@@ -10,7 +10,7 @@ $commands = {
 }
 
 def run_command(command)
-  puts "running command '#{command}'..."
+  puts "Command: \n" + command
   output, status = Open3.capture2e(command)
 
   puts "Output: \n" + output
