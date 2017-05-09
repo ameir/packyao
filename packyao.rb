@@ -36,7 +36,17 @@ def generate_packer_config(params)
     'export_path' => 'image.tar',
   }]
 
-  packer['provisioners'] = [$commands]
+  packer['provisioners'] = []
+  if Dir.exist?('files')
+    files = {
+      'type' => 'file',
+      'source' => 'files',
+      'destination' => '/tmp/',
+    }
+    packer['provisioners'].push(files)
+  end
+  packer['provisioners'].push($commands)
+
   puts packer
   puts JSON.pretty_generate(packer)
   File.write('packer.json', JSON.pretty_generate(packer))
