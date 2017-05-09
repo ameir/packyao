@@ -6,7 +6,7 @@ require 'open3'
 require 'fileutils'
 
 $commands = {
-  'type' => 'shell'
+  'type' => 'shell',
 }
 
 def run_command(command)
@@ -33,7 +33,7 @@ def generate_packer_config(params)
   packer['builders'] = [{
     'type' => 'docker',
     'image' => params['build_distro'],
-    'export_path' => 'image.tar'
+    'export_path' => 'image.tar',
   }]
 
   packer['provisioners'] = [$commands]
@@ -90,6 +90,18 @@ def create_package(params)
     '--verbose',
     '--force'
   ]
+
+  if params['dependencies'] && params['dependencies'].is_a?(Array)
+    params['dependencies'].each do |d|
+      arguments.push('-d', d)
+    end
+  end
+
+  if params['scripts'] && params['scripts'].is_a?(Hash)
+    params['scripts'].each do |type, file|
+      arguments.push("--#{type}", file)
+    end
+  end
 
   puts "Creating #{params['output']} build..."
   raise 'problem creating package' unless FPM::Command.new('fpm').run(arguments) == 0
