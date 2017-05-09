@@ -109,7 +109,7 @@ def create_package(params)
 
   if params['scripts'] && params['scripts'].is_a?(Hash)
     params['scripts'].each do |type, file|
-      arguments.push("--#{type}", file)
+      arguments.push("--#{type}", "recipe/#{file}")
     end
   end
 
