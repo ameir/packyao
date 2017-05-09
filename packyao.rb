@@ -72,7 +72,7 @@ def create_package_layout(params)
 
   files_hash.each do |source, destination|
     puts "Processing: #{source} -> #{destination}"
-    destination_dir = File.dirname(scratchspace + destination)
+    destination_dir = destination[-1] == '/' ? scratchspace + destination : File.dirname(scratchspace + destination)
     puts "Creating directory '#{destination_dir}'..."
     FileUtils.mkdir_p(destination_dir) unless Dir.exist?(destination_dir)
     puts "Copying: #{source} -> #{scratchspace + destination}"
