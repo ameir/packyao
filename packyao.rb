@@ -79,7 +79,9 @@ def create_package_layout(params)
     run_command("cd /tmp; tar xvf #{__dir__}/image.tar --wildcards '#{source[1..-1]}'")
     puts "Globbing /tmp#{source}:"
     p Dir.glob("/tmp#{source}")
-    FileUtils.cp_r(Dir.glob("/tmp#{source}"), scratchspace + destination, verbose: true)
+    Dir.glob("/tmp#{source}").each do |file|
+      FileUtils.cp_r(file, scratchspace + destination, verbose: true)
+    end
   end
 end
 
