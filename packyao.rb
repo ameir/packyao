@@ -113,6 +113,9 @@ def create_package(params)
     end
   end
 
+  puts 'Arguments passed to FPM:'
+  p arguments
+
   puts "Creating #{params['output']} build..."
   raise 'problem creating package' unless FPM::Command.new('fpm').run(arguments) == 0
 end
