@@ -80,7 +80,7 @@ def create_package_layout(params)
     puts "Globbing /tmp#{source}:"
     p Dir.glob("/tmp#{source}")
     Dir.glob("/tmp#{source}").each do |file|
-      FileUtils.cp_r(file, scratchspace + destination, verbose: true)
+      run_command("cp -av #{file} #{scratchspace + destination}")
     end
   end
 end
